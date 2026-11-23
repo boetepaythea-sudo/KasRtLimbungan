@@ -827,7 +827,7 @@
         measurementId: "G-95SM1RJ0T8"
       };
       /* Bootstrap super admin UID. This first account can manage other admin UID records. */
-      const ADMIN_UIDS = ["dhd1PyB2pOZ9d1pCABkOe6SP9B32"];
+      const SUPER_ADMIN_UIDS = ["dhd1PyB2pOZ9d1pCABkOe6SP9B32"];
 
       const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), storage = getStorage(app);
       const col = name => collection(db, name), $ = id => document.getElementById(id);
