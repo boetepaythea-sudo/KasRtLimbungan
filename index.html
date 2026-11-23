@@ -1,0 +1,996 @@
+<!doctype html>
+<html lang="id">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#075e55">
+    <title>Kas RT 01 & RT 02 — Blok Rabu | V3.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet">
+    <style>
+      :root {
+        --bg: #f3f7f6;
+        --paper: #fff;
+        --ink: #172d34;
+        --muted: #71838a;
+        --line: #e4ecea;
+        --green: #087f70;
+        --deep: #075e55;
+        --mint: #e8f6f2;
+        --red: #c0444b;
+        --redbg: #fff0ef;
+        --blue: #3864b5;
+        --shadow: 0 10px 30px #183d3810
+      }
+
+      * {
+        box-sizing: border-box
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 14px/1.55 "DM Sans", system-ui, sans-serif
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit
+      }
+
+      button {
+        cursor: pointer
+      }
+
+      .shell {
+        max-width: 1440px;
+        margin: auto;
+        padding: 22px
+      }
+
+      .hero {
+        border-radius: 24px;
+        padding: 25px 28px;
+        background: linear-gradient(115deg, #064e48, #087f70 65%, #18a187);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        box-shadow: 0 18px 42px #075e5528
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 15px
+      }
+
+      .logo {
+        width: 54px;
+        height: 54px;
+        border-radius: 17px;
+        background: #ffffff20;
+        border: 1px solid #ffffff40;
+        display: grid;
+        place-items: center;
+        font-size: 25px
+      }
+
+      .hero h1 {
+        font-size: clamp(20px, 3vw, 29px);
+        margin: 0;
+        letter-spacing: -.7px
+      }
+
+      .hero p {
+        margin: 5px 0 0;
+        color: #d6f5ed;
+        font-size: 13px
+      }
+
+      .clock {
+        min-width: 190px;
+        text-align: right;
+        background: #ffffff15;
+        border: 1px solid #ffffff35;
+        border-radius: 15px;
+        padding: 9px 14px
+      }
+
+      .clock small {
+        display: block;
+        color: #d6f5ed;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 700
+      }
+
+      .clock strong {
+        font-size: 23px;
+        font-variant-numeric: tabular-nums
+      }
+
+      .clock span {
+        display: block;
+        font-size: 11px;
+        color: #e5faf4
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 17px 0
+      }
+
+      .nav {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        padding: 5px;
+        background: #e7efed;
+        border: 1px solid #dfe9e6;
+        border-radius: 14px
+      }
+
+      .nav button {
+        border: 0;
+        border-radius: 10px;
+        background: transparent;
+        padding: 9px 13px;
+        color: #60747a;
+        font-size: 12px;
+        font-weight: 700
+      }
+
+      .nav button.active {
+        background: #fff;
+        color: var(--deep);
+        box-shadow: 0 3px 10px #153d3712
+      }
+
+      .status {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 700
+      }
+
+      .btn {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 700;
+        background: #eaf0ef;
+        color: #29434a
+      }
+
+      .btn.primary {
+        background: var(--green);
+        color: white
+      }
+
+      .btn.danger {
+        background: var(--redbg);
+        color: #a52e37
+      }
+
+      .btn.outline {
+        background: white;
+        border: 1px solid var(--line)
+      }
+
+      .btn.sm {
+        padding: 6px 9px;
+        font-size: 11px
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 15px
+      }
+
+      .card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 19px;
+        box-shadow: var(--shadow);
+        min-width: 0
+      }
+
+      .s4 {
+        grid-column: span 4
+      }
+
+      .s6 {
+        grid-column: span 6
+      }
+
+      .s8 {
+        grid-column: span 8
+      }
+
+      .s12 {
+        grid-column: span 12
+      }
+
+      .stat {
+        position: relative;
+        overflow: hidden
+      }
+
+      .stat:after {
+        content: "";
+        position: absolute;
+        width: 95px;
+        height: 95px;
+        border-radius: 50%;
+        right: -32px;
+        top: -35px;
+        background: var(--mint)
+      }
+
+      .stat:nth-child(2):after {
+        background: #fff0e9
+      }
+
+      .stat:nth-child(3):after {
+        background: #eaf0ff
+      }
+
+      .stat label {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700
+      }
+
+      .stat strong {
+        display: block;
+        position: relative;
+        z-index: 1;
+        font-size: clamp(21px, 3vw, 29px);
+        margin-top: 7px;
+        letter-spacing: -.8px;
+        overflow-wrap: anywhere
+      }
+
+      .stat:nth-child(1) strong {
+        color: var(--green)
+      }
+
+      .stat:nth-child(2) strong {
+        color: var(--red)
+      }
+
+      .stat:nth-child(3) strong {
+        color: var(--blue)
+      }
+
+      h2 {
+        font-size: 16px;
+        margin: 0 0 14px;
+        letter-spacing: -.2px
+      }
+
+      .sub {
+        font-size: 11px;
+        color: var(--muted)
+      }
+
+      .row {
+        display: flex;
+        gap: 9px;
+        align-items: center;
+        flex-wrap: wrap
+      }
+
+      .between {
+        justify-content: space-between
+      }
+
+      .field {
+        min-width: 0
+      }
+
+      .field label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        color: #536970;
+        margin-bottom: 5px
+      }
+
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        border: 1px solid #dce7e4;
+        border-radius: 10px;
+        padding: 10px 11px;
+        background: #fcfefd;
+        color: var(--ink);
+        outline: none
+      }
+
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        border-color: #48a99b;
+        box-shadow: 0 0 0 3px #087f7017
+      }
+
+      .formgrid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 11px
+      }
+
+      .full {
+        grid-column: 1/-1
+      }
+
+      .tablewrap {
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 12px
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 650px
+      }
+
+      th,
+      td {
+        padding: 11px 12px;
+        text-align: left;
+        border-bottom: 1px solid #edf2f0;
+        font-size: 12px
+      }
+
+      th {
+        background: #f7faf9;
+        color: #6b7e82;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: .6px
+      }
+
+      td.num {
+        text-align: right;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums
+      }
+
+      tr:last-child td {
+        border: 0
+      }
+
+      tbody tr:hover {
+        background: #fbfdfc
+      }
+
+      .pill {
+        display: inline-block;
+        border-radius: 30px;
+        padding: 4px 9px;
+        font-size: 10px;
+        font-weight: 800
+      }
+
+      .income {
+        background: #e4f6ee;
+        color: #16724f
+      }
+
+      .expense {
+        background: #fff0ef;
+        color: #b13c44
+      }
+
+      .pending {
+        background: #fff5df;
+        color: #956314
+      }
+
+      .paid {
+        background: #e4f6ee;
+        color: #16724f
+      }
+
+      .hidden {
+        display: none !important
+      }
+
+      .notice {
+        padding: 11px 13px;
+        background: #eaf7f3;
+        color: #17675c;
+        border-radius: 11px;
+        font-size: 12px;
+        margin: 10px 0
+      }
+
+      .notice.err {
+        background: #fff0ef;
+        color: #a52e37
+      }
+
+      .empty {
+        text-align: center;
+        color: var(--muted);
+        padding: 25px 12px;
+        font-size: 12px
+      }
+
+      .filters {
+        display: flex;
+        gap: 9px;
+        flex-wrap: wrap;
+        margin-bottom: 12px
+      }
+
+      .filters .field {
+        flex: 1;
+        min-width: 140px
+      }
+
+      .login {
+        max-width: 460px;
+        margin: 35px auto
+      }
+
+      .login .field {
+        margin-bottom: 12px
+      }
+
+      .kpi-note {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 5px
+      }
+
+      .chartbox {
+        height: 270px;
+        position: relative
+      }
+
+      .filehint {
+        font-size: 10px;
+        color: var(--muted)
+      }
+
+      footer {
+        text-align: center;
+        color: #829397;
+        font-size: 11px;
+        padding: 25px 8px
+      }
+
+      @media(max-width:850px) {
+        .s4 {
+          grid-column: span 6
+        }
+
+        .s8,
+        .s6 {
+          grid-column: span 12
+        }
+      }
+
+      @media(max-width:620px) {
+        .shell {
+          padding: 11px
+        }
+
+        .hero {
+          padding: 18px;
+          border-radius: 19px;
+          align-items: flex-start;
+          flex-direction: column
+        }
+
+        .clock {
+          width: 100%;
+          text-align: left;
+          display: grid;
+          grid-template-columns: 1fr auto;
+          align-items: center
+        }
+
+        .clock strong {
+          grid-column: 2;
+          grid-row: 1/3
+        }
+
+        .clock span {
+          grid-column: 1
+        }
+
+        .nav {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          width: 100%
+        }
+
+        .nav button {
+          padding: 9px 3px;
+          font-size: 10px
+        }
+
+        .toolbar {
+          align-items: stretch
+        }
+
+        .toolbar>div:last-child {
+          justify-content: space-between
+        }
+
+        .s4 {
+          grid-column: span 12
+        }
+
+        .formgrid {
+          grid-template-columns: 1fr
+        }
+
+        .full {
+          grid-column: auto
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="shell">
+      <header class="hero">
+        <div class="brand">
+          <div class="logo">▦</div>
+          <div>
+            <h1>Kas RT 01 & RT 02 — Blok Rabu</h1>
+            <p>Desa Tanjiweetan · Kecamatan Kasokandel · Kabupaten Majalengka</p>
+          </div>
+        </div>
+        <div class="clock"><small>Waktu sekarang · WIB perangkat</small><strong id="liveTime">--:--:--</strong><span
+            id="liveDate">Memuat tanggal…</span></div>
+      </header>
+      <div class="toolbar">
+        <nav class="nav" aria-label="Menu utama">
+          <button class="active" data-view="dashboard">Dashboard</button>
+          <button data-view="transactions">Transaksi</button>
+          <button data-view="residents">Data Warga</button>
+          <button data-view="dues">Iuran Warga</button>
+          <button data-view="reports">Laporan</button>
+          <button data-view="admin">Admin</button>
+        </nav>
+        <div class="row"><span id="connectionStatus" class="status">Menghubungkan…</span><button id="logoutBtn"
+            class="btn sm hidden">Keluar</button></div>
+      </div>
+
+      <main>
+        <section id="view-dashboard">
+          <div class="grid">
+            <article class="card stat s4"><label>Total Pemasukan</label><strong id="sumIncome">Rp0</strong>
+              <div class="kpi-note">Akumulasi seluruh RT</div>
+            </article>
+            <article class="card stat s4"><label>Total Pengeluaran</label><strong id="sumExpense">Rp0</strong>
+              <div class="kpi-note">Akumulasi seluruh RT</div>
+            </article>
+            <article class="card stat s4"><label>Saldo Kas Bersama</label><strong id="sumBalance">Rp0</strong>
+              <div class="kpi-note">Pemasukan dikurangi pengeluaran</div>
+            </article>
+            <article class="card s8">
+              <div class="row between">
+                <h2>Arus Kas Bulanan</h2><span class="sub">12 bulan terakhir</span>
+              </div>
+              <div class="chartbox"><canvas id="cashChart"></canvas></div>
+            </article>
+            <article class="card s4">
+              <h2>Komposisi Kas</h2>
+              <div class="chartbox"><canvas id="pieChart"></canvas></div>
+            </article>
+            <article class="card s12">
+              <div class="row between">
+                <h2>Transaksi Terbaru</h2><button class="btn sm outline" data-goto="transactions">Lihat semua</button>
+              </div>
+              <div id="recentTable" class="tablewrap">
+                <div class="empty">Memuat data…</div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="view-transactions" class="hidden">
+          <div class="grid">
+            <article class="card s12">
+              <div class="row between">
+                <h2>Riwayat Transaksi Kas Bersama</h2><span class="sub" id="transactionCount">0 transaksi</span>
+              </div>
+              <div class="filters">
+                <div class="field"><label>Jenis</label><select id="txType">
+                    <option value="">Semua jenis</option>
+                    <option value="pemasukan">Pemasukan</option>
+                    <option value="pengeluaran">Pengeluaran</option>
+                  </select></div>
+                <div class="field"><label>Wilayah</label><select id="txRT">
+                    <option value="">RT 01 & RT 02</option>
+                    <option>RT 01</option>
+                    <option>RT 02</option>
+                    <option value="Umum">Umum</option>
+                  </select></div>
+                <div class="field"><label>Bulan</label><input id="txMonth" type="month"></div>
+                <div class="field"><label>Cari keterangan</label><input id="txSearch" placeholder="Cari transaksi…">
+                </div>
+              </div>
+              <div id="transactionsTable" class="tablewrap"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="view-residents" class="hidden">
+          <div class="grid">
+            <article class="card s4 admin-only hidden">
+              <h2>Tambah Data Warga</h2>
+              <form id="residentForm" class="formgrid">
+                <div class="field full"><label>Nama kepala keluarga / warga</label><input name="name" required
+                    maxlength="100"></div>
+                <div class="field"><label>Wilayah RT</label><select name="rt">
+                    <option>RT 01</option>
+                    <option>RT 02</option>
+                  </select></div>
+                <div class="field"><label>Nomor rumah</label><input name="house" placeholder="Contoh: R-01"></div>
+                <div class="field full"><label>Nomor HP (opsional)</label><input name="phone" type="tel"></div>
+                <div class="field full"><label>Alamat / catatan</label><textarea name="address" rows="2"></textarea>
+                </div>
+                <button class="btn primary full">Simpan Warga</button>
+              </form>
+            </article>
+            <article class="card s8" id="residentListCard">
+              <div class="row between">
+                <h2>Daftar Warga</h2><span class="sub" id="residentCount">0 warga</span>
+              </div>
+              <div class="filters">
+                <div class="field"><label>Filter RT</label><select id="residentRT">
+                    <option value="">Semua RT</option>
+                    <option>RT 01</option>
+                    <option>RT 02</option>
+                  </select></div>
+                <div class="field"><label>Pencarian</label><input id="residentSearch"
+                    placeholder="Nama atau nomor rumah"></div>
+              </div>
+              <div id="residentsTable" class="tablewrap"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="view-dues" class="hidden">
+          <div class="grid">
+            <article class="card s4 admin-only hidden">
+              <h2>Buat Tagihan Iuran</h2>
+              <form id="duesForm" class="formgrid">
+                <div class="field full"><label>Warga</label><select name="residentId" id="duesResident" required>
+                    <option value="">Pilih warga…</option>
+                  </select></div>
+                <div class="field full"><label>Periode iuran</label><input name="period" type="month" required></div>
+                <div class="field full"><label>Nominal (Rp)</label><input name="amount" type="number" min="1" step="1"
+                    required></div>
+                <div class="field full"><label>Keterangan (opsional)</label><input name="description"
+                    placeholder="Iuran kas bulanan"></div>
+                <button class="btn primary full">Buat Tagihan</button>
+              </form>
+              <p class="filehint">Tagihan yang dibuat berstatus belum dibayar sampai admin mencatat pembayarannya.</p>
+            </article>
+            <article class="card s8">
+              <div class="row between">
+                <h2>Rekap Iuran Warga</h2><span class="sub" id="duesSummary">—</span>
+              </div>
+              <div class="filters">
+                <div class="field"><label>Periode</label><input id="duesMonth" type="month"></div>
+                <div class="field"><label>Status</label><select id="duesStatus">
+                    <option value="">Semua status</option>
+                    <option value="belum">Belum dibayar</option>
+                    <option value="lunas">Lunas</option>
+                  </select></div>
+              </div>
+              <div id="duesTable" class="tablewrap"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="view-reports" class="hidden">
+          <div class="grid">
+            <article class="card s12">
+              <div class="row between">
+                <div>
+                  <h2>Laporan Keuangan Kas Bersama</h2>
+                  <div class="sub">Pilih rentang tanggal untuk menyusun laporan</div>
+                </div>
+                <div class="row"><button id="exportExcel" class="btn">Unduh Excel</button><button id="exportPDF"
+                    class="btn primary">Cetak / PDF</button></div>
+              </div>
+              <div class="filters" style="margin-top:15px">
+                <div class="field"><label>Dari tanggal</label><input id="reportFrom" type="date"></div>
+                <div class="field"><label>Sampai tanggal</label><input id="reportTo" type="date"></div>
+                <div class="field"><label>Wilayah</label><select id="reportRT">
+                    <option value="">Semua wilayah</option>
+                    <option>RT 01</option>
+                    <option>RT 02</option>
+                    <option value="Umum">Umum</option>
+                  </select></div>
+              </div>
+              <div id="reportSummary" class="grid"></div>
+              <div id="reportTable" class="tablewrap" style="margin-top:14px"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="view-admin" class="hidden">
+          <div id="loginPanel" class="card login">
+            <h2>Login Administrator</h2>
+            <p class="sub">Masuk menggunakan akun yang telah dibuat di Firebase Authentication.</p>
+            <div id="loginMessage" class="notice err hidden"></div>
+            <form id="loginForm">
+              <div class="field"><label>Email admin</label><input id="loginEmail" type="email" autocomplete="username"
+                  required></div>
+              <div class="field"><label>Password</label><input id="loginPassword" type="password"
+                  autocomplete="current-password" required></div>
+              <button class="btn primary" style="width:100%">Login Admin</button>
+            </form>
+          </div>
+          <div id="adminPanel" class="hidden">
+            <div class="notice">Anda masuk sebagai <b id="adminIdentity">administrator</b>. Data yang disimpan akan
+              diperbarui otomatis di dashboard.</div>
+            <div class="grid">
+              <article class="card s6">
+                <h2>Input Transaksi Kas</h2>
+                <form id="transactionForm" class="formgrid">
+                  <div class="field"><label>Jenis transaksi</label><select name="type">
+                      <option value="pemasukan">Pemasukan</option>
+                      <option value="pengeluaran">Pengeluaran</option>
+                    </select></div>
+                  <div class="field"><label>Tanggal</label><input name="date" type="date" required></div>
+                  <div class="field full"><label>Keterangan</label><input name="description" required maxlength="180"
+                      placeholder="Contoh: Iuran warga / perbaikan jalan"></div>
+                  <div class="field"><label>Nominal (Rp)</label><input name="amount" type="number" min="1" step="1"
+                      required></div>
+                  <div class="field"><label>Wilayah</label><select name="rt">
+                      <option>Umum</option>
+                      <option>RT 01</option>
+                      <option>RT 02</option>
+                    </select></div>
+                  <div class="field full"><label>Bukti transaksi (foto/PDF, opsional)</label><input name="proof"
+                      type="file" accept="image/*,application/pdf"><span class="filehint">Maksimal 5 MB. File disimpan
+                      di Firebase Storage.</span></div>
+                  <button class="btn primary full">Simpan Transaksi</button>
+                </form>
+              </article>
+              <article class="card s6">
+                <h2>Manajemen Administrator</h2>
+                <p class="sub">Daftarkan UID pengguna Firebase Authentication yang sudah dibuat sebelumnya. Jangan
+                  pernah memasukkan password di sini.</p>
+                <form id="adminForm" class="formgrid">
+                  <div class="field full"><label>UID akun Firebase</label><input name="uid" required
+                      placeholder="Salin User UID dari Firebase Authentication"></div>
+                  <div class="field"><label>Nama admin</label><input name="name" required placeholder="Nama petugas">
+                  </div>
+                  <div class="field"><label>Peran</label><select name="role">
+                      <option value="bendahara">Bendahara</option>
+                      <option value="pengurus">Pengurus</option>
+                      <option value="superadmin">Superadmin</option>
+                    </select></div>
+                  <button class="btn primary full">Tambahkan Admin</button>
+                </form>
+                <div id="adminsTable" style="margin-top:13px"></div>
+              </article>
+              <article class="card s12">
+                <h2>Kelola Transaksi Terbaru</h2>
+                <div id="manageTransactions" class="tablewrap"></div>
+              </article>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer>Kas RT 01 & RT 02 Blok Rabu · V3.0 · Informasi keuangan untuk transparansi warga</footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+
+    <script type="module">
+      import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import {getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, getDoc, setDoc, where} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      import {getStorage, ref, uploadBytes, getDownloadURL} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+      /* PASTE CONFIG FIREBASE PROJECT AND ADMIN UID FROM YOUR CURRENT WORKING V2 FILE. */
+      const firebaseConfig = {
+        apiKey: "AIzaSyBVkXXw6Y-FVsS92tlclPJJ5OyT1cN9Blc",
+        authDomain: "kas-rt-limbungan.firebaseapp.com",
+        projectId: "kas-rt-limbungan",
+        storageBucket: "kas-rt-limbungan.firebasestorage.app",
+        messagingSenderId: "449730885513",
+        appId: "1:449730885513:web:82804eb65b5af06cf11358",
+        measurementId: "G-95SM1RJ0T8"
+      };
+      /* Bootstrap super admin UID. This first account can manage other admin UID records. */
+      const ADMIN_UIDS = ["dhd1PyB2pOZ9d1pCABkOe6SP9B32"];
+
+      const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), storage = getStorage(app);
+      const col = name => collection(db, name), $ = id => document.getElementById(id);
+      let transactions = [], residents = [], dues = [], admins = [], user = null, role = null, charts = {};
+      const rupiah = n => new Intl.NumberFormat("id-ID", {style: "currency", currency: "IDR", maximumFractionDigits: 0}).format(Number(n) || 0);
+      const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+      const dateLabel = s => {if (!s) return "—"; let [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString("id-ID", {day: "2-digit", month: "short", year: "numeric"});};
+      const isAdmin = () => !!user && !!role;
+      const isSuper = () => !!user && (SUPER_ADMIN_UIDS.includes(user.uid) || role === "superadmin");
+      const today = () => {let d = new Date(); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);};
+
+      function clock() {let d = new Date(); $("liveTime").textContent = new Intl.DateTimeFormat("id-ID", {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false}).format(d); $("liveDate").textContent = new Intl.DateTimeFormat("id-ID", {weekday: "long", day: "2-digit", month: "long", year: "numeric"}).format(d);}
+      clock(); setInterval(clock, 1000);
+
+      function show(view) {document.querySelectorAll("main section").forEach(s => s.classList.add("hidden")); $("view-" + view).classList.remove("hidden"); document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("active", b.dataset.view === view)); if (view === "reports") renderReport(); if (view === "dashboard") renderCharts();}
+      document.querySelectorAll(".nav button").forEach(b => b.onclick = () => show(b.dataset.view));
+      document.querySelectorAll("[data-goto]").forEach(b => b.onclick = () => show(b.dataset.goto));
+
+      function txTable(items, admin = false) {
+        if (!items.length) return '<div class="empty">Belum ada transaksi.</div>';
+        return `<table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Wilayah</th><th>Keterangan</th><th style="text-align:right">Nominal</th><th>Bukti</th>${admin ? '<th>Aksi</th>' : ''}</tr></thead><tbody>${items.map(t => `<tr><td>${dateLabel(t.date)}</td><td><span class="pill ${t.type === "pemasukan" ? "income" : "expense"}">${t.type}</span></td><td>${esc(t.rt || "Umum")}</td><td>${esc(t.description)}</td><td class="num">${rupiah(t.amount)}</td><td>${t.proofUrl ? `<a href="${esc(t.proofUrl)}" target="_blank" rel="noopener">Lihat</a>` : "—"}</td>${admin ? `<td><button class="btn sm danger" data-delete-tx="${esc(t.id)}">Hapus</button></td>` : ""}</tr>`).join("")}</tbody></table>`;
+      }
+      function sums(items) {return items.reduce((o, t) => {o[t.type] = (o[t.type] || 0) + Number(t.amount || 0); return o;}, {pemasukan: 0, pengeluaran: 0});}
+      function render() {
+        let s = sums(transactions), sorted = [...transactions].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+        $("sumIncome").textContent = rupiah(s.pemasukan); $("sumExpense").textContent = rupiah(s.pengeluaran); $("sumBalance").textContent = rupiah(s.pemasukan - s.pengeluaran);
+        $("recentTable").innerHTML = txTable(sorted.slice(0, 7));
+        let t = sorted.filter(x => (!$("txType").value || x.type === $("txType").value) && (!$("txRT").value || x.rt === $("txRT").value) && (!$("txMonth").value || (x.date || "").startsWith($("txMonth").value)) && (!$("txSearch").value || x.description?.toLowerCase().includes($("txSearch").value.toLowerCase())));
+        $("transactionsTable").innerHTML = txTable(t); $("transactionCount").textContent = t.length + " transaksi";
+        renderResidents(); renderDues(); if (isAdmin()) $("manageTransactions").innerHTML = txTable(sorted, true);
+        renderCharts();
+      }
+      ["txType", "txRT", "txMonth", "txSearch"].forEach(id => $(id).addEventListener("input", render));
+
+      function renderCharts() {
+        if (!window.Chart) return;
+        const now = new Date(), labels = [], inc = [], out = [];
+        for (let i = 11; i >= 0; i--) {let d = new Date(now.getFullYear(), now.getMonth() - i, 1), key = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); labels.push(d.toLocaleDateString("id-ID", {month: "short", year: "2-digit"})); let list = transactions.filter(t => (t.date || "").startsWith(key)); inc.push(sums(list).pemasukan); out.push(sums(list).pengeluaran);}
+        if (charts.cash) charts.cash.destroy();
+        charts.cash = new Chart($("cashChart"), {type: "bar", data: {labels, datasets: [{label: "Pemasukan", data: inc, backgroundColor: "#159b78", borderRadius: 5}, {label: "Pengeluaran", data: out, backgroundColor: "#e58a78", borderRadius: 5}]}, options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: "bottom"}}, scales: {y: {beginAtZero: true, ticks: {callback: v => "Rp" + Intl.NumberFormat("id-ID", {notation: "compact"}).format(v)}}}}});
+        if (charts.pie) charts.pie.destroy();
+        let s = sums(transactions);
+        charts.pie = new Chart($("pieChart"), {type: "doughnut", data: {labels: ["Pemasukan", "Pengeluaran"], datasets: [{data: [s.pemasukan, s.pengeluaran], backgroundColor: ["#159b78", "#e58a78"], borderWidth: 0}]}, options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: "bottom"}}}});
+      }
+
+      function renderResidents() {
+        const rt = $("residentRT").value, term = $("residentSearch").value.toLowerCase();
+        let list = residents.filter(r => (!rt || r.rt === rt) && (!term || (r.name || "").toLowerCase().includes(term) || (r.house || "").toLowerCase().includes(term)));
+        $("residentCount").textContent = list.length + " warga";
+        $("residentsTable").innerHTML = list.length ? `<table><thead><tr><th>Nama</th><th>RT</th><th>No. Rumah</th><th>Kontak</th>${isAdmin() ? "<th>Aksi</th>" : ""}</tr></thead><tbody>${list.map(r => `<tr><td><b>${esc(r.name)}</b><br><span class="sub">${esc(r.address || "")}</span></td><td>${esc(r.rt)}</td><td>${esc(r.house || "—")}</td><td>${esc(r.phone || "—")}</td>${isAdmin() ? `<td><button class="btn sm danger" data-delete-res="${esc(r.id)}">Hapus</button></td>` : ""}</tr>`).join("")}</tbody></table>` : '<div class="empty">Data warga belum tersedia.</div>';
+        $("duesResident").innerHTML = '<option value="">Pilih warga…</option>' + residents.map(r => `<option value="${esc(r.id)}">${esc(r.name)} — ${esc(r.rt)}</option>`).join("");
+      }
+      $("residentRT").onchange = renderResidents; $("residentSearch").oninput = renderResidents;
+
+      function renderDues() {
+        let month = $("duesMonth").value, status = $("duesStatus").value;
+        let list = dues.filter(d => (!month || d.period === month) && (!status || (status === "lunas" ? d.status === "lunas" : d.status !== "lunas")));
+        let paid = list.filter(d => d.status === "lunas").length;
+        $("duesSummary").textContent = `${paid} lunas · ${list.length - paid} belum dibayar`;
+        $("duesTable").innerHTML = list.length ? `<table><thead><tr><th>Periode</th><th>Warga</th><th>RT</th><th>Nominal</th><th>Status</th>${isAdmin() ? "<th>Aksi</th>" : ""}</tr></thead><tbody>${list.map(d => `<tr><td>${esc(d.period)}</td><td>${esc(d.residentName)}</td><td>${esc(d.rt)}</td><td class="num">${rupiah(d.amount)}</td><td><span class="pill ${d.status === "lunas" ? "paid" : "pending"}">${d.status === "lunas" ? "Lunas" : "Belum dibayar"}</span></td>${isAdmin() ? `<td>${d.status !== "lunas" ? `<button class="btn sm primary" data-pay-dues="${esc(d.id)}">Catat bayar</button>` : "—"} <button class="btn sm danger" data-delete-dues="${esc(d.id)}">Hapus</button></td>` : ""}</tr>`).join("")}</tbody></table>` : '<div class="empty">Belum ada tagihan pada filter ini.</div>';
+      }
+      $("duesMonth").onchange = renderDues; $("duesStatus").onchange = renderDues;
+
+      function reportItems() {
+        let from = $("reportFrom").value, to = $("reportTo").value, rt = $("reportRT").value;
+        return [...transactions].filter(t => (!from || t.date >= from) && (!to || t.date <= to) && (!rt || t.rt === rt)).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+      }
+      function renderReport() {
+        let items = reportItems(), s = sums(items);
+        $("reportSummary").innerHTML = `<div class="card s4"><span class="sub">Pemasukan</span><h2>${rupiah(s.pemasukan)}</h2></div><div class="card s4"><span class="sub">Pengeluaran</span><h2>${rupiah(s.pengeluaran)}</h2></div><div class="card s4"><span class="sub">Saldo periode</span><h2>${rupiah(s.pemasukan - s.pengeluaran)}</h2></div>`;
+        $("reportTable").innerHTML = txTable(items);
+      }
+      ["reportFrom", "reportTo", "reportRT"].forEach(id => $(id).addEventListener("change", renderReport));
+
+      $("exportExcel").onclick = () => {
+        let items = reportItems(); if (!window.XLSX) return alert("Pustaka Excel belum termuat. Periksa koneksi internet.");
+        let rows = items.map(t => ({Tanggal: t.date, Jenis: t.type, Wilayah: t.rt || "Umum", Keterangan: t.description, Nominal: Number(t.amount)}));
+        rows.push({Tanggal: "", Jenis: "TOTAL PEMASUKAN", Wilayah: "", Keterangan: "", Nominal: sums(items).pemasukan}, {Tanggal: "", Jenis: "TOTAL PENGELUARAN", Wilayah: "", Keterangan: "", Nominal: sums(items).pengeluaran}, {Tanggal: "", Jenis: "SALDO PERIODE", Wilayah: "", Keterangan: "", Nominal: sums(items).pemasukan - sums(items).pengeluaran});
+        let ws = XLSX.utils.json_to_sheet(rows), wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Laporan Kas"); XLSX.writeFile(wb, "Laporan-Kas-RT-Blok-Rabu.xlsx");
+      };
+      $("exportPDF").onclick = () => {
+        let items = reportItems(), s = sums(items); if (!window.jspdf) return alert("Pustaka PDF belum termuat. Periksa koneksi internet.");
+        let {jsPDF} = window.jspdf, doc = new jsPDF(); doc.setFontSize(16); doc.text("LAPORAN KAS RT 01 & RT 02 — BLOK RABU", 14, 18); doc.setFontSize(9); doc.text("Desa Tanjiweetan, Kecamatan Kasokandel, Kabupaten Majalengka", 14, 25);
+        doc.text(`Pemasukan: ${rupiah(s.pemasukan)} | Pengeluaran: ${rupiah(s.pengeluaran)} | Saldo periode: ${rupiah(s.pemasukan - s.pengeluaran)}`, 14, 33);
+        doc.autoTable({startY: 39, head: [["Tanggal", "Jenis", "RT", "Keterangan", "Nominal"]], body: items.map(t => [t.date, t.type, t.rt || "Umum", t.description, rupiah(t.amount)]), styles: {fontSize: 8}, headStyles: {fillColor: [8, 127, 112]}});
+        doc.save("Laporan-Kas-RT-Blok-Rabu.pdf");
+      };
+
+      $("loginForm").onsubmit = async e => {e.preventDefault(); try {await signInWithEmailAndPassword(auth, $("loginEmail").value.trim(), $("loginPassword").value); $("loginMessage").classList.add("hidden");} catch (err) {$("loginMessage").textContent = "Login gagal: " + err.message; $("loginMessage").classList.remove("hidden");} };
+      $("logoutBtn").onclick = () => signOut(auth);
+
+      onAuthStateChanged(auth, async u => {
+        user = u; role = null;
+        if (u) {
+          if (SUPER_ADMIN_UIDS.includes(u.uid)) role = "superadmin";
+          else {try {let snap = await getDoc(doc(db, "admins", u.uid)); if (snap.exists()) role = snap.data().role || "pengurus";} catch (e) {console.error(e);} }
+        }
+        let admin = isAdmin();
+        $("loginPanel").classList.toggle("hidden", admin); $("adminPanel").classList.toggle("hidden", !admin); $("logoutBtn").classList.toggle("hidden", !admin);
+        document.querySelectorAll(".admin-only").forEach(el => el.classList.toggle("hidden", !admin));
+        $("adminIdentity").textContent = u ? (u.email || u.uid) : "administrator";
+        $("adminForm").classList.toggle("hidden", !isSuper());
+        $("connectionStatus").textContent = admin ? "Admin aktif · data tersinkron" : "Mode baca warga";
+        render(); renderAdmins();
+      });
+
+      function listen(name, sortField, callback) {
+        let q = sortField ? query(col(name), orderBy(sortField, "desc")) : col(name);
+        onSnapshot(q, snap => {callback(snap.docs.map(d => ({id: d.id, ...d.data()}))); render();}, err => {$("connectionStatus").textContent = "Periksa aturan Firebase"; console.error(name, err);});
+      }
+      listen("transaksi", "date", v => transactions = v);
+      listen("warga", "name", v => residents = v);
+      listen("iuran", "period", v => dues = v);
+      listen("admins", "name", v => admins = v);
+
+      $("transactionForm").elements.date.value = today();
+      $("transactionForm").onsubmit = async e => {
+        e.preventDefault(); if (!isAdmin()) return alert("Akses admin diperlukan.");
+        let f = e.currentTarget, fd = new FormData(f), file = fd.get("proof"), proofUrl = "";
+        let amount = Number(fd.get("amount"));
+        if (!Number.isSafeInteger(amount) || amount <= 0) return alert("Nominal tidak valid.");
+        try {
+          if (file && file.size) {if (file.size > 5 * 1024 * 1024) return alert("Ukuran bukti maksimal 5 MB."); let path = `bukti-transaksi/${user.uid}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`; let uploaded = await uploadBytes(ref(storage, path), file); proofUrl = await getDownloadURL(uploaded.ref);}
+          await addDoc(col("transaksi"), {type: fd.get("type"), date: fd.get("date"), description: fd.get("description").trim(), amount, rt: fd.get("rt"), proofUrl, createdAt: serverTimestamp(), createdBy: user.uid});
+          f.reset(); f.elements.date.value = today(); alert("Transaksi tersimpan.");
+        } catch (err) {alert("Gagal menyimpan transaksi: " + err.message);}
+      };
+      $("residentForm").onsubmit = async e => {
+        e.preventDefault(); if (!isAdmin()) return; let f = e.currentTarget, d = new FormData(f);
+        try {await addDoc(col("warga"), {name: d.get("name").trim(), rt: d.get("rt"), house: d.get("house").trim(), phone: d.get("phone").trim(), address: d.get("address").trim(), createdAt: serverTimestamp(), createdBy: user.uid}); f.reset(); alert("Data warga tersimpan.");} catch (err) {alert(err.message);}
+      };
+      $("duesForm").onsubmit = async e => {
+        e.preventDefault(); if (!isAdmin()) return; let f = e.currentTarget, d = new FormData(f), r = residents.find(x => x.id === d.get("residentId")), amount = Number(d.get("amount"));
+        if (!r || !Number.isSafeInteger(amount) || amount <= 0) return alert("Periksa warga dan nominal.");
+        if (dues.some(x => x.residentId === r.id && x.period === d.get("period"))) return alert("Tagihan warga untuk periode tersebut sudah ada.");
+        try {await addDoc(col("iuran"), {residentId: r.id, residentName: r.name, rt: r.rt, period: d.get("period"), amount, description: d.get("description") || "Iuran kas bulanan", status: "belum", createdAt: serverTimestamp(), createdBy: user.uid}); f.reset(); alert("Tagihan berhasil dibuat.");} catch (err) {alert(err.message);}
+      };
+      $("adminForm").onsubmit = async e => {
+        e.preventDefault(); if (!isSuper()) return; let f = e.currentTarget, d = new FormData(f), uid = d.get("uid").trim();
+        if (!uid) return;
+        try {await setDoc(doc(db, "admins", uid), {uid, name: d.get("name").trim(), role: d.get("role"), createdAt: serverTimestamp(), createdBy: user.uid}); f.reset(); alert("Data admin ditambahkan. Pastikan UID tersebut milik akun Firebase Authentication yang sudah dibuat.");} catch (err) {alert("Gagal menambah admin: " + err.message);}
+      };
+      function renderAdmins() {
+        if (!isSuper()) {$("adminsTable").innerHTML = '<div class="sub">Hanya superadmin yang dapat mengelola daftar admin.</div>'; return;}
+        $("adminsTable").innerHTML = admins.length ? `<div class="tablewrap"><table><thead><tr><th>Nama</th><th>UID</th><th>Peran</th><th>Aksi</th></tr></thead><tbody>${admins.map(a => `<tr><td>${esc(a.name)}</td><td>${esc(a.uid)}</td><td>${esc(a.role)}</td><td><button class="btn sm danger" data-delete-admin="${esc(a.uid)}">Hapus</button></td></tr>`).join("")}</tbody></table></div>` : '<div class="empty">Belum ada admin tambahan.</div>';
+      }
+      document.addEventListener("click", async e => {
+        let tx = e.target.closest("[data-delete-tx]")?.dataset.deleteTx;
+        let res = e.target.closest("[data-delete-res]")?.dataset.deleteRes;
+        let due = e.target.closest("[data-delete-dues]")?.dataset.deleteDues;
+        let pay = e.target.closest("[data-pay-dues]")?.dataset.payDues;
+        let adm = e.target.closest("[data-delete-admin]")?.dataset.deleteAdmin;
+        if (tx && isAdmin() && confirm("Hapus transaksi ini?")) {try {await deleteDoc(doc(db, "transaksi", tx));} catch (err) {alert(err.message);} }
+        if (res && isAdmin() && confirm("Hapus data warga ini? Riwayat iuran lama tidak ikut terhapus.")) {try {await deleteDoc(doc(db, "warga", res));} catch (err) {alert(err.message);} }
+        if (due && isAdmin() && confirm("Hapus tagihan iuran ini?")) {try {await deleteDoc(doc(db, "iuran", due));} catch (err) {alert(err.message);} }
+        if (pay && isAdmin()) {
+          let d = dues.find(x => x.id === pay); if (!d || d.status === "lunas") return;
+          if (!confirm(`Catat pembayaran ${rupiah(d.amount)} dari ${d.residentName}? Ini juga akan mencatat pemasukan kas.`)) return;
+          try {await addDoc(col("transaksi"), {type: "pemasukan", date: today(), description: `Pembayaran iuran ${d.residentName} (${d.period})`, amount: Number(d.amount), rt: d.rt, createdAt: serverTimestamp(), createdBy: user.uid, sourceDuesId: d.id}); await updateDoc(doc(db, "iuran", pay), {status: "lunas", paidAt: serverTimestamp(), paidBy: user.uid}); alert("Pembayaran tercatat dan masuk ke kas.");} catch (err) {alert("Gagal mencatat pembayaran: " + err.message);}
+        }
+        if (adm && isSuper() && !SUPER_ADMIN_UIDS.includes(adm) && confirm("Cabut akses admin UID ini?")) {try {await deleteDoc(doc(db, "admins", adm));} catch (err) {alert(err.message);} }
+      });
+    </script>
+  </body>
+
+</html>
