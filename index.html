@@ -342,6 +342,7 @@
 
       .tablewrap {
         overflow: auto;
+        -webkit-overflow-scrolling: touch;
         border: 1px solid var(--line);
         border-radius: 12px
       }
@@ -361,6 +362,7 @@
       }
 
       th {
+        position: sticky; top: 0; z-index: 1;
         background: #f7faf9;
         color: #6b7e82;
         text-transform: uppercase;
@@ -428,6 +430,9 @@
         color: #a52e37
       }
 
+      .table-footer {display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 2px 2px;color:var(--muted);font-size:11px}
+      .table-footer select {border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:#fff;color:var(--ink)}
+      .table-actions {display:flex;gap:6px;flex-wrap:wrap}
       .empty {
         text-align: center;
         color: var(--muted);
@@ -644,16 +649,15 @@
             <article class="card s4 admin-only hidden">
               <h2>Tambah Data Warga</h2>
               <form id="residentForm" class="formgrid">
-                <div class="field full"><label>Nama kepala keluarga / warga</label><input name="name" required
-                    maxlength="100"></div>
-                <div class="field"><label>Wilayah RT</label><select name="rt">
-                    <option>RT 01</option>
-                    <option>RT 02</option>
-                  </select></div>
-                <div class="field"><label>Nomor rumah</label><input name="house" placeholder="Contoh: R-01"></div>
-                <div class="field full"><label>Nomor HP (opsional)</label><input name="phone" type="tel"></div>
-                <div class="field full"><label>Alamat / catatan</label><textarea name="address" rows="2"></textarea>
-                </div>
+                <div class="field full"><label>No. Identitas KTP (16 digit)</label><input name="nik" inputmode="numeric" maxlength="16" pattern="[0-9]{16}" required placeholder="Masukkan 16 digit NIK"></div>
+                <div class="field"><label>Penduduk RT</label><select name="rt" required><option>RT 01</option><option>RT 02</option></select></div>
+                <div class="field"><label>Nama warga</label><input name="name" required maxlength="100"></div>
+                <div class="field"><label>Jenis Kelamin</label><select name="gender" required><option value="">Pilih jenis kelamin</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div>
+                <div class="field"><label>Tempat Lahir</label><input name="birthPlace" maxlength="80"></div>
+                <div class="field"><label>Status</label><select name="status"><option value="">Pilih status</option><option>Belum Kawin</option><option>Kawin</option><option>Cerai Hidup</option><option>Cerai Mati</option></select></div>
+                <div class="field"><label>Tanggal Lahir</label><input name="birthDate" type="date" required></div>
+                <div class="field"><label>Usia (otomatis)</label><input id="residentAgePreview" readonly placeholder="Otomatis dihitung"></div>
+                <div class="field full"><label>No. HP</label><input name="phone" type="tel" placeholder="08xxxxxxxxxx"></div>
                 <button class="btn primary full">Simpan Warga</button>
               </form>
             </article>
@@ -661,16 +665,27 @@
               <div class="row between">
                 <h2>Daftar Warga</h2><span class="sub" id="residentCount">0 warga</span>
               </div>
+              <div class="admin-only hidden" style="margin-bottom:16px;padding:14px;background:#f7faf9;border:1px dashed #b9d4cd;border-radius:12px">
+                <h2 style="margin-bottom:6px">Upload Data Warga via Excel</h2>
+                <p class="sub" style="margin:0 0 10px">Urutan kolom: No Urut (opsional), No Identitas KTP, Penduduk RT, Nama, Jenis Kelamin, Tempat Lahir, Status, Tanggal Lahir, Usia (otomatis), No HP. NIK wajib 16 digit dan kolom Excel harus berformat Text (Teks) agar digit tidak berubah. Data yang NIK-nya sudah ada atau berulang di file akan dilewati.</p>
+                <div class="row">
+                  <input id="residentExcel" type="file" accept=".xlsx,.xls,.csv" style="max-width:360px">
+                  <button id="uploadResidentExcel" type="button" class="btn primary">Upload Data Excel</button>
+                  <button id="downloadResidentTemplate" type="button" class="btn outline">Unduh Template</button>
+                </div>
+                <div id="residentUploadMessage" class="sub" style="margin-top:8px"></div>
+              </div>
               <div class="filters">
                 <div class="field"><label>Filter RT</label><select id="residentRT">
                     <option value="">Semua RT</option>
                     <option>RT 01</option>
                     <option>RT 02</option>
                   </select></div>
-                <div class="field"><label>Pencarian</label><input id="residentSearch"
-                    placeholder="Nama atau nomor rumah"></div>
+                <div class="field"><label>Pencarian</label><input id="residentSearch" placeholder="Cari NIK, nama, atau nomor HP"></div>
+                <div class="field" style="max-width:150px"><label>Tampilkan data</label><select id="residentPageSize"><option>10</option><option>25</option><option>50</option><option>100</option></select></div>
               </div>
               <div id="residentsTable" class="tablewrap"></div>
+              <div id="residentPagination" class="table-footer"></div>
             </article>
           </div>
         </section>
@@ -813,7 +828,7 @@
     <script type="module">
       import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
       import {getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import {getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, getDoc, setDoc, where} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      import {getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, getDoc, getDocs, setDoc, where, runTransaction} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
       import {getStorage, ref, uploadBytes, getDownloadURL} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
       /* PASTE CONFIG FIREBASE PROJECT AND ADMIN UID FROM YOUR CURRENT WORKING V2 FILE. */
@@ -838,6 +853,9 @@
       const isAdmin = () => !!user && !!role;
       const isSuper = () => !!user && (SUPER_ADMIN_UIDS.includes(user.uid) || role === "superadmin");
       const today = () => {let d = new Date(); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);};
+      const normalizeNIK = v => String(v ?? "").replace(/\D/g, "");
+      function ageFromBirthDate(value) { if (!value) return ""; const b = new Date(value + "T00:00:00"), n = new Date(); if (Number.isNaN(b.getTime()) || b > n) return ""; let age = n.getFullYear() - b.getFullYear(); if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) age--; return age; }
+      function excelDate(value) { if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString().slice(0,10); if (typeof value === "number" && value > 0) { const d = XLSX.SSF.parse_date_code(value); if (d) return `${d.y}-${String(d.m).padStart(2,"0")}-${String(d.d).padStart(2,"0")}`; } const v=String(value ?? "").trim(); if (!v) return ""; let m=v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/); if(m) return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`; if(/^\d{4}-\d{2}-\d{2}$/.test(v)) return v; const d=new Date(v); return Number.isNaN(d.getTime()) ? "" : d.toISOString().slice(0,10); }
 
       function clock() {let d = new Date(); $("liveTime").textContent = new Intl.DateTimeFormat("id-ID", {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false}).format(d); $("liveDate").textContent = new Intl.DateTimeFormat("id-ID", {weekday: "long", day: "2-digit", month: "long", year: "numeric"}).format(d);}
       clock(); setInterval(clock, 1000);
@@ -873,14 +891,21 @@
         charts.pie = new Chart($("pieChart"), {type: "doughnut", data: {labels: ["Pemasukan", "Pengeluaran"], datasets: [{data: [s.pemasukan, s.pengeluaran], backgroundColor: ["#159b78", "#e58a78"], borderWidth: 0}]}, options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: "bottom"}}}});
       }
 
+      let residentPage = 1;
       function renderResidents() {
-        const rt = $("residentRT").value, term = $("residentSearch").value.toLowerCase();
-        let list = residents.filter(r => (!rt || r.rt === rt) && (!term || (r.name || "").toLowerCase().includes(term) || (r.house || "").toLowerCase().includes(term)));
-        $("residentCount").textContent = list.length + " warga";
-        $("residentsTable").innerHTML = list.length ? `<table><thead><tr><th>Nama</th><th>RT</th><th>No. Rumah</th><th>Kontak</th>${isAdmin() ? "<th>Aksi</th>" : ""}</tr></thead><tbody>${list.map(r => `<tr><td><b>${esc(r.name)}</b><br><span class="sub">${esc(r.address || "")}</span></td><td>${esc(r.rt)}</td><td>${esc(r.house || "—")}</td><td>${esc(r.phone || "—")}</td>${isAdmin() ? `<td><button class="btn sm danger" data-delete-res="${esc(r.id)}">Hapus</button></td>` : ""}</tr>`).join("")}</tbody></table>` : '<div class="empty">Data warga belum tersedia.</div>';
+        const rt = $("residentRT").value, term = $("residentSearch").value.toLowerCase().trim();
+        let list = residents.filter(r => (!rt || r.rt === rt) && (!term || [r.nik,r.name,r.phone].some(v => String(v || "").toLowerCase().includes(term))));
+        list.sort((a,b) => String(a.nik || "").localeCompare(String(b.nik || "")) || String(a.name || "").localeCompare(String(b.name || "")));
+        const size = Number($("residentPageSize")?.value || 10), pages = Math.max(1, Math.ceil(list.length / size)); residentPage = Math.min(residentPage, pages);
+        const shown = list.slice((residentPage-1)*size, residentPage*size);
+        $("residentCount").textContent = `${list.length.toLocaleString("id-ID")} warga`;
+        $("residentsTable").innerHTML = isAdmin() ? (shown.length ? `<table><thead><tr><th>No Urut</th><th>No Identitas KTP</th><th>Penduduk RT</th><th>Nama</th><th>Jenis Kelamin</th><th>Tempat Lahir</th><th>Status</th><th>Tanggal Lahir</th><th>Usia</th><th>No HP</th><th>Action</th></tr></thead><tbody>${shown.map((r,i) => `<tr><td>${(residentPage-1)*size+i+1}</td><td><b>${esc(r.nik || "—")}</b></td><td>${esc(r.rt || "—")}</td><td>${esc(r.name || "—")}</td><td>${esc(r.gender || "—")}</td><td>${esc(r.birthPlace || "—")}</td><td>${esc(r.status || "—")}</td><td>${dateLabel(r.birthDate)}</td><td>${r.birthDate ? ageFromBirthDate(r.birthDate) + " th" : "—"}</td><td>${esc(r.phone || "—")}</td><td><div class="table-actions"><button class="btn sm outline" data-edit-res="${esc(r.id)}">Edit</button><button class="btn sm danger" data-delete-res="${esc(r.id)}">Hapus</button></div></td></tr>`).join("")}</tbody></table>` : '<div class="empty">Data warga belum tersedia.</div>') : '<div class="empty">Tabel data warga hanya dapat diakses oleh administrator.</div>';
+        $("residentPagination").innerHTML = isAdmin() ? `<span>Menampilkan ${list.length ? (residentPage-1)*size+1 : 0}–${Math.min(residentPage*size,list.length)} dari ${list.length} data</span><div class="row"><button class="btn sm outline" id="residentPrev" ${residentPage<=1?'disabled':''}>Sebelumnya</button><span>Halaman ${residentPage} / ${pages}</span><button class="btn sm outline" id="residentNext" ${residentPage>=pages?'disabled':''}>Berikutnya</button></div>` : "";
+        $("residentPrev")?.addEventListener("click",()=>{residentPage--;renderResidents();}); $("residentNext")?.addEventListener("click",()=>{residentPage++;renderResidents();});
         $("duesResident").innerHTML = '<option value="">Pilih warga…</option>' + residents.map(r => `<option value="${esc(r.id)}">${esc(r.name)} — ${esc(r.rt)}</option>`).join("");
       }
-      $("residentRT").onchange = renderResidents; $("residentSearch").oninput = renderResidents;
+      $("residentRT").onchange = () => {residentPage=1;renderResidents();}; $("residentSearch").oninput = () => {residentPage=1;renderResidents();}; $("residentPageSize").onchange = () => {residentPage=1;renderResidents();};
+      $("residentForm").elements.birthDate.addEventListener("change", e => {$("residentAgePreview").value = ageFromBirthDate(e.target.value) === "" ? "" : ageFromBirthDate(e.target.value) + " tahun";});
 
       function renderDues() {
         let month = $("duesMonth").value, status = $("duesStatus").value;
@@ -957,7 +982,11 @@
       };
       $("residentForm").onsubmit = async e => {
         e.preventDefault(); if (!isAdmin()) return; let f = e.currentTarget, d = new FormData(f);
-        try {await addDoc(col("warga"), {name: d.get("name").trim(), rt: d.get("rt"), house: d.get("house").trim(), phone: d.get("phone").trim(), address: d.get("address").trim(), createdAt: serverTimestamp(), createdBy: user.uid}); f.reset(); alert("Data warga tersimpan.");} catch (err) {alert(err.message);}
+        const nik = normalizeNIK(d.get("nik")), birthDate = d.get("birthDate");
+        if (!/^\d{16}$/.test(nik)) return alert("Nomor Identitas KTP harus tepat 16 digit.");
+        if (!birthDate || ageFromBirthDate(birthDate) === "") return alert("Tanggal lahir tidak valid.");
+        if (residents.some(r => normalizeNIK(r.nik) === nik)) return alert("Nomor Identitas KTP sudah terdaftar.");
+        try {const refWarga=doc(db,"warga","nik_"+nik); await runTransaction(db,async tx=>{const snap=await tx.get(refWarga);if(snap.exists())throw new Error("NIK sudah terdaftar.");tx.set(refWarga,{nik,name:d.get("name").trim(),gender:d.get("gender"),rt:d.get("rt"),birthPlace:d.get("birthPlace").trim(),status:d.get("status"),birthDate,age:ageFromBirthDate(birthDate),phone:d.get("phone").trim(),createdAt:serverTimestamp(),createdBy:user.uid});}); f.reset(); $("residentAgePreview").value=""; alert("Data warga tersimpan.");} catch (err) {alert(err.message);}
       };
       $("duesForm").onsubmit = async e => {
         e.preventDefault(); if (!isAdmin()) return; let f = e.currentTarget, d = new FormData(f), r = residents.find(x => x.id === d.get("residentId")), amount = Number(d.get("amount"));
@@ -974,13 +1003,61 @@
         if (!isSuper()) {$("adminsTable").innerHTML = '<div class="sub">Hanya superadmin yang dapat mengelola daftar admin.</div>'; return;}
         $("adminsTable").innerHTML = admins.length ? `<div class="tablewrap"><table><thead><tr><th>Nama</th><th>UID</th><th>Peran</th><th>Aksi</th></tr></thead><tbody>${admins.map(a => `<tr><td>${esc(a.name)}</td><td>${esc(a.uid)}</td><td>${esc(a.role)}</td><td><button class="btn sm danger" data-delete-admin="${esc(a.uid)}">Hapus</button></td></tr>`).join("")}</tbody></table></div>` : '<div class="empty">Belum ada admin tambahan.</div>';
       }
+      // Template Excel memakai NIK sebagai kunci anti-duplikasi.
+      $("downloadResidentTemplate").onclick = () => {
+        if (!window.XLSX) return alert("Pustaka Excel belum termuat. Periksa koneksi internet.");
+        const ws = XLSX.utils.aoa_to_sheet([["No Urut","No Identitas KTP","Penduduk RT","Nama","Jenis Kelamin","Tempat Lahir","Status","Tanggal Lahir","Usia","No HP"],[1,"3200000000000001","RT 01","Contoh Nama","Laki-laki","Tasikmalaya","Kawin","1990-01-31","","081234567890"]]);
+        ws["!cols"] = [{wch:10},{wch:22},{wch:14},{wch:25},{wch:16},{wch:20},{wch:16},{wch:16},{wch:10},{wch:18}];
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data Warga"); XLSX.writeFile(wb, "Template-Upload-Data-Warga.xlsx");
+      };
+      $("uploadResidentExcel").onclick = async () => {
+        if (!isAdmin()) return alert("Akses admin diperlukan.");
+        const input=$("residentExcel"), file=input.files?.[0], msg=$("residentUploadMessage"); if(!file) return alert("Pilih file Excel terlebih dahulu."); if(!window.XLSX) return alert("Pustaka Excel belum termuat. Periksa koneksi internet.");
+        const button=$("uploadResidentExcel"); button.disabled=true; button.textContent="Memproses…";
+        try {
+          const workbook=XLSX.read(await file.arrayBuffer(),{type:"array",cellDates:true,raw:false}), sheet=workbook.Sheets[workbook.SheetNames[0]], rows=XLSX.utils.sheet_to_json(sheet,{defval:"",raw:false,blankrows:false});
+          if(!rows.length) return alert("File tidak berisi data warga.");
+          // Normalisasi diterapkan pada HEADER dan ALIAS agar perbedaan spasi/tanda baca tidak membuat kolom terlewat.
+          const norm=v=>String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
+          const pick=(row,aliases)=>{const wanted=new Set(aliases.map(norm));const key=Object.keys(row).find(k=>wanted.has(norm(k)));return key===undefined?"":row[key];};
+          const parsed=rows.map((row,i)=>({rowNumber:i+2,nik:normalizeNIK(pick(row,["No Identitas KTP","Nomor Identitas KTP","Nomor Penduduk","No Penduduk","Nomor Induk Penduduk","No Induk Penduduk","NIK","No Identitas","No KTP","Nomor KTP","KTP"])),rt:String(pick(row,["Penduduk RT","RT Penduduk","Wilayah RT","RT","Alamat RT"])).trim().toUpperCase().replace(/\s+/g," "),name:String(pick(row,["Nama","Nama Warga","Nama Lengkap","Nama Penduduk"])).trim(),gender:String(pick(row,["Jenis Kelamin","Gender","JK","L/P"])).trim(),birthPlace:String(pick(row,["Tempat Lahir","Kota Lahir","Kabupaten Lahir"])).trim(),status:String(pick(row,["Status","Status Perkawinan","Perkawinan"])).trim(),birthDate:excelDate(pick(row,["Tanggal Lahir","Tgl Lahir","Tgl. Lahir","TanggalLahir","Birth Date","Birthdate"])),phone:String(pick(row,["No HP","Nomor HP","Nomor Handphone","No. HP","No Telepon","Nomor Telepon","Telepon","HP","Phone"])).trim()})).filter(r=>Object.values(r).some(v=>String(v??"").trim()));
+          const valid=[], errors=[], seen=new Set();
+          for(const r of parsed){ if(!/^\d{16}$/.test(r.nik)){errors.push(`Baris ${r.rowNumber}: NIK harus 16 digit.`);continue;} if(seen.has(r.nik)){errors.push(`Baris ${r.rowNumber}: NIK ganda di dalam file, dilewati.`);continue;} seen.add(r.nik); if(!["RT 01","RT 02"].includes(r.rt)){errors.push(`Baris ${r.rowNumber}: Penduduk RT harus RT 01 atau RT 02.`);continue;} if(!r.name){errors.push(`Baris ${r.rowNumber}: Nama wajib diisi.`);continue;} let g=r.gender.toLowerCase(); r.gender=g==="laki-laki"||g==="laki laki"||g==="l"?"Laki-laki":g==="perempuan"||g==="p"?"Perempuan":""; if(!r.gender){errors.push(`Baris ${r.rowNumber}: Jenis Kelamin tidak valid.`);continue;} if(!r.birthDate||ageFromBirthDate(r.birthDate)===""){errors.push(`Baris ${r.rowNumber}: Tanggal Lahir tidak valid.`);continue;} valid.push(r); }
+          if(!valid.length){const headers=Object.keys(rows[0]||{}).join(", ");msg.textContent=(errors.slice(0,8).join(" ")||"Tidak ada baris valid.")+` Header terbaca: ${headers}`;return alert("Tidak ada data valid untuk diupload. Periksa judul kolom Excel.\nHeader terbaca: "+headers);}
+          const existing=new Set(residents.map(r=>normalizeNIK(r.nik)).filter(Boolean));
+          const fresh=valid.filter(r=>{if(existing.has(r.nik)){errors.push(`Baris ${r.rowNumber}: NIK sudah terdaftar, dilewati.`);return false;} existing.add(r.nik);return true;});
+          if(!fresh.length){msg.textContent=`0 data baru. ${valid.length} data dilewati karena NIK sudah ada atau ganda.`;return alert(msg.textContent);}
+          if(!confirm(`Ditemukan ${fresh.length} data baru. ${valid.length-fresh.length} data akan dilewati karena NIK sudah terdaftar/ganda. Lanjutkan upload?`)) return;
+          let saved=0, skipped=0;
+          for(const r of fresh){
+            // Deterministic document ID + transaction prevents a repeated upload from creating another record.
+            const refWarga=doc(db,"warga","nik_"+r.nik);
+            const result=await runTransaction(db,async tx=>{const snap=await tx.get(refWarga);if(snap.exists()) return false;tx.set(refWarga,{nik:r.nik,rt:r.rt,name:r.name,gender:r.gender,birthPlace:r.birthPlace,status:r.status,birthDate:r.birthDate,age:ageFromBirthDate(r.birthDate),phone:r.phone,createdAt:serverTimestamp(),createdBy:user.uid,importSource:file.name});return true;});
+            if(result)saved++;else skipped++;
+          }
+          msg.textContent=`Selesai: ${saved} data baru ditambahkan, ${skipped} terlewati karena sudah ada, ${errors.length} baris tidak valid/ganda dilewati.`; input.value=""; alert(msg.textContent);
+        }catch(err){console.error(err);msg.textContent="Upload gagal: "+err.message;alert("Upload data warga gagal: "+err.message);}finally{button.disabled=false;button.textContent="Upload Data Excel";}
+      };
+
+      async function editResident(id) {
+        if(!isAdmin()) return alert("Akses admin diperlukan."); const r=residents.find(x=>x.id===id); if(!r) return alert("Data warga tidak ditemukan.");
+        const nik=prompt("No Identitas KTP (16 digit):",r.nik||""); if(nik===null)return; const normalized=normalizeNIK(nik);
+        if(!/^\d{16}$/.test(normalized))return alert("NIK harus tepat 16 digit."); if(residents.some(x=>x.id!==id&&normalizeNIK(x.nik)===normalized))return alert("NIK tersebut sudah digunakan warga lain.");
+        const rt=prompt("Penduduk RT (RT 01 / RT 02):",r.rt||"RT 01");if(rt===null)return;const name=prompt("Nama:",r.name||"");if(name===null)return;const gender=prompt("Jenis Kelamin (Laki-laki / Perempuan):",r.gender||"");if(gender===null)return;const birthPlace=prompt("Tempat Lahir:",r.birthPlace||"");if(birthPlace===null)return;const status=prompt("Status:",r.status||"");if(status===null)return;const birthDate=prompt("Tanggal Lahir (YYYY-MM-DD):",r.birthDate||"");if(birthDate===null)return;const phone=prompt("No HP:",r.phone||"");if(phone===null)return;
+        const normalizedRT=rt.trim().toUpperCase().replace(/\s+/g," "),g=gender.trim().toLowerCase(),normalizedGender=g==="laki-laki"||g==="laki laki"?"Laki-laki":g==="perempuan"?"Perempuan":"";
+        if(!["RT 01","RT 02"].includes(normalizedRT)||!name.trim()||!normalizedGender||ageFromBirthDate(birthDate)==="")return alert("Periksa kembali RT, nama, jenis kelamin, dan tanggal lahir.");
+        try{await updateDoc(doc(db,"warga",id),{nik:normalized,rt:normalizedRT,name:name.trim(),gender:normalizedGender,birthPlace:birthPlace.trim(),status:status.trim(),birthDate,age:ageFromBirthDate(birthDate),phone:phone.trim(),updatedAt:serverTimestamp(),updatedBy:user.uid});alert("Data warga berhasil diperbarui.");}catch(err){alert("Gagal memperbarui data: "+err.message);}
+      }
+
       document.addEventListener("click", async e => {
         let tx = e.target.closest("[data-delete-tx]")?.dataset.deleteTx;
         let res = e.target.closest("[data-delete-res]")?.dataset.deleteRes;
+        let editRes = e.target.closest("[data-edit-res]")?.dataset.editRes;
         let due = e.target.closest("[data-delete-dues]")?.dataset.deleteDues;
         let pay = e.target.closest("[data-pay-dues]")?.dataset.payDues;
         let adm = e.target.closest("[data-delete-admin]")?.dataset.deleteAdmin;
         if (tx && isAdmin() && confirm("Hapus transaksi ini?")) {try {await deleteDoc(doc(db, "transaksi", tx));} catch (err) {alert(err.message);} }
+        if (editRes && isAdmin()) await editResident(editRes);
         if (res && isAdmin() && confirm("Hapus data warga ini? Riwayat iuran lama tidak ikut terhapus.")) {try {await deleteDoc(doc(db, "warga", res));} catch (err) {alert(err.message);} }
         if (due && isAdmin() && confirm("Hapus tagihan iuran ini?")) {try {await deleteDoc(doc(db, "iuran", due));} catch (err) {alert(err.message);} }
         if (pay && isAdmin()) {
